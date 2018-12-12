@@ -45,10 +45,10 @@ val bulk_delete : Bot.t -> channel_id : string -> string list -> unit Lwt.t
 
 (** Creates a {!create_message} object that can then be sent using {!send}. *)
 val create : content:string -> ?nonce:string -> ?tts:bool -> ?file:string ->
-  ?embed:Types_v.embed -> ?payload_json:string -> unit -> Types_v.create_message
+  ?embed:embed -> ?payload_json:string -> unit -> create_message
 
 (** [Message.mentions message user] returns [true] if the [message] mentions
     [user]
 *)
-val mentions : t -> Types_t.user -> bool
+val mentions : t -> user -> bool
 
