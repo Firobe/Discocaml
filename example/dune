@@ -1,0 +1,5 @@
+(executable
+	(name discochameau)
+	(libraries discocaml lwt)
+	(preprocess (pps lwt_ppx))
+)

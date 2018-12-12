@@ -1,0 +1,23 @@
+(library
+	(name discocaml)
+	(public_name discocaml)
+	(libraries atdgen cohttp-lwt-unix websocket-lwt extlib)
+	(preprocess (pps lwt_ppx))
+	(private_modules types_v types_j http wrappers)
+)
+
+(rule
+ (targets types_t.ml
+          types_t.mli)
+ (deps    types.atd)
+ (action  (run atdgen -t %{deps})))
+(rule
+ (targets types_j.ml
+          types_j.mli)
+ (deps    types.atd)
+ (action  (run atdgen -j -j-std %{deps})))
+(rule
+ (targets types_v.ml
+          types_v.mli)
+ (deps    types.atd)
+ (action  (run atdgen -v %{deps})))

@@ -1,0 +1,418 @@
+type raw_json <ocaml module="Yojson.Safe" t="json"> = abstract
+
+type payload = [
+	| Hello of hello
+	| Identify of identify
+	| Event of event
+	| Invalid_session of inv_session
+	| Heartbeat of int
+	| Heartbeat_ACK of garbage
+]<json adapter.ocaml="Wrappers.Payload_adapter"><ocaml repr="classic">
+
+type garbage = {~d : int; ~t : int}
+type hello = {heartbeat_interval : int}
+
+type event = {
+	s : int;
+	e : event_kind;
+}<json adapter.ocaml="Wrappers.Event_adapter"> 
+
+type event_kind = [
+	| READY of ready
+	| CHANNEL_CREATE of channel
+	| CHANNEL_UPDATE of channel
+	| CHANNEL_DELETE of channel
+	| CHANNEL_PINS_UPDATE of pins_update
+	| GUILD_CREATE of guild
+	| GUILD_UPDATE of guild
+	| GUILD_DELETE of unavailable_guild
+	| GUILD_BAN_ADD of ban
+	| GUILD_BAN_REMOVE of ban
+	| GUILD_EMOJIS_UPDATE of emoji_update
+	| GUILD_INTEGRATIONS_UPDATE of single_guild_id
+	| GUILD_MEMBER_ADD of guild_member
+	| GUILD_MEMBER_REMOVE of guild_member
+	| GUILD_MEMBER_UPDATE of guild_member_update
+	| GUILD_ROLE_CREATE of guild_role_update
+	| GUILD_ROLE_UPDATE of guild_role_update
+	| GUILD_ROLE_DELETE of guild_role_delete
+	| MESSAGE_CREATE of message
+	| MESSAGE_UPDATE of message_update
+	| MESSAGE_DELETE of message_delete
+	| MESSAGE_DELETE_BULK of message_delete_bulk
+	| MESSAGE_REACTION_ADD of reaction_update
+	| MESSAGE_REACTION_REMOVE of reaction_update
+	| MESSAGE_REACTION_REMOVE_ALL of reaction_remove_all
+	| PRESENCE_UPDATE of presence_update
+	| TYPING_START of typing_start
+	| USER_UPDATE of user
+	| VOICE_STATE_UPDATE of voice_state
+	| VOICE_SERVER_UPDATE of voice_server_update
+	| WEBHOOKS_UPDATE of webhook_update
+	| PRESENCES_REPLACE of raw_json
+]<ocaml repr="classic">
+
+type webhook_update = {
+	guild_id : string;
+	channel_id : string;
+}
+
+type voice_server_update = {
+	token : string;
+	guild_id : string;
+	endpoint : string;
+}
+
+type reaction_remove_all = {
+	channel_id : string;
+	message_id : string;
+	~guild_id : string;
+}
+
+type reaction_update = {
+	user_id : string;
+	channel_id : string;
+	message_id : string;
+	~guild_id : string;
+	emoji : emoji;
+}
+
+type message_delete = {
+	id : string;
+	channel_id : string;
+	~guild_id : string;
+}
+
+type message_delete_bulk = {
+	ids : string list;
+	channel_id : string;
+	~guild_id : string;
+}
+
+type guild_role_update = {
+	guild_id : string;
+	role : role;
+}
+
+type guild_role_delete = {
+	guild_id : string;
+	role_id : string;
+}
+
+type guild_member_update = {
+	guild_id : string;
+	roles : string list;
+	user : user;
+	?nick : string option;
+}
+
+type single_guild_id = {
+	guild_id : string
+}
+
+type emoji_update = {
+	guild_id : string;
+	emojis : emoji list
+}
+
+type ban = {
+	guild_id : string;
+	user : user
+}
+
+type pins_update = {
+	channel_id : string;
+	~last_pin_timestamp : string;
+}
+
+type typing_start = {
+	channel_id : string;
+	~guild_id : string;
+	user_id : string;
+	timestamp : int
+}
+
+type identify_properties = {
+	os <json name="$os"> : string;
+	browser <json name="$browser"> : string;
+	device <json name="$device"> : string;
+}
+type identify = {
+	token : string;
+	properties : identify_properties
+}
+
+type inv_session = {
+	d <ocaml name="resumable"> : bool
+}
+
+type ready = {
+	v : int;
+	user : user;
+	private_channels : channel list;
+	guilds : unavailable_guild list;
+	session_id : string;
+}
+
+type overwrite_t = [
+	  Role <json name="role">
+	| Member <json name="member">
+]
+type overwrite = {
+	id : string;
+	kind <json name="type"> : overwrite_t;
+	allow : int;
+	deny : int;
+}
+
+type channel = {
+	id : string;
+	kind <json name="type"> : int;
+	?guild_id : string option;
+	?position : int option;
+	~permission_overwrites : overwrite list;
+	?name : string option;
+	?topic : string option;
+	?nsfw : bool option;
+	?last_message_id : string option;
+	?bitrate : int option;
+	?user_limit : int option;
+	?rate_limit_per_user : int option;
+	~recipients : user list;
+	?icon : string option;
+	?owner_id : string option;
+	?application_id : string option;
+	?parent_id : string option;
+	?last_pin_timestamp : string option;
+} <ocaml field_prefix="channel_">
+
+type message_activity = {
+	kind <json name="type"> : int;
+	?party_id : string option;
+}
+
+type message_application = {
+	id : string;
+	cover_image : string;
+	description : string;
+	icon : string;
+	name : string;
+}
+
+type message_update = {
+	id : string;
+	channel_id : string;
+	?guild_id : string option;
+	?author : user option;
+	?member : guild_member option;
+	~content : string;
+	~timestamp : string;
+	?edited_timestamp : string option;
+	~tts : bool;
+	~mention_everyone : bool;
+	~mentions : user list;
+	~mention_roles : role list;
+	~attachments : attachment list;
+	~embed : embed list;
+	~reactions : reaction list;
+	?nonce : string option;
+	~pinned : bool;
+	?webhook_id : string option;
+	?kind <json name="type"> : int option;
+	?activity : message_activity option;
+	?application : message_application option;
+}
+
+type message = {
+	id : string;
+	channel_id : string;
+	?guild_id : string option;
+	author : user;
+	?member : guild_member option;
+	content : string;
+	timestamp : string;
+	?edited_timestamp : string option;
+	tts : bool;
+	mention_everyone : bool;
+	mentions : user list;
+	mention_roles : role list;
+	attachments : attachment list;
+	~embed : embed list;
+	~reactions : reaction list;
+	?nonce : string option;
+	pinned : bool;
+	?webhook_id : string option;
+	kind <json name="type"> : int;
+	?activity : message_activity option;
+	?application : message_application option;
+}
+type message_array = message list
+
+type unavailable_guild = {
+	id : string;
+	~unavailable : bool;
+}
+
+type guild = {
+	id : string;
+	name : string;
+	?icon : string option;
+	?splash : string option;
+	?owner : bool option;
+	owner_id : string;
+	?permissions : int option;
+	region : string;
+	?afk_channel_id : string option;
+	afk_timeout : int;
+	?embed_enabled : bool option;
+	?embed_channel_id : string option;
+	verification_level : int;
+	default_message_notifications : int;
+	explicit_content_filter : int;
+	roles : role list;
+	emojis : emoji list;
+	features : string list;
+	mfa_level : int;
+	?application_id : string option;
+	?widget_enabled : bool option;
+	?widget_channel_id : string option;
+	?system_channel_id : string option;
+	?joined_at : string option;
+	?large : bool option;
+	?unavailable : bool option;
+	?member_count : int option;
+	~voice_states : voice_state list;
+	~members : guild_member list;
+	~channels : channel list;
+	~presences : presence_update list;
+}
+
+type voice_state = {
+	~guild_id : string;
+	~channel_id : string;
+	user_id : string;
+	?member : guild_member option;
+	session_id : string;
+	deaf : bool;
+	mute : bool;
+	self_deaf : bool;
+	self_mute : bool;
+	suppress : bool;
+}
+
+type presence_update = {
+	user : user;
+	~roles : string list;
+	?game : activity option;
+	~guild_id : string;
+	status : string;
+	activities : activity list;
+}
+
+type activity = {
+	name : string;
+	kind <json name="type"> : int;
+	(* TODO other fields *)
+}
+
+type invite = {
+	code : string;
+	?guild : guild option;
+	channel : channel;
+	?approximate_presence_count : int option;
+	?approximate_member_count : int option;
+}
+
+(* MESSAGE REST *)
+
+type create_invite = {
+	?max_age : int option;
+	?max_uses : int option;
+	?temporary : bool option;
+	?unique : bool option;
+}
+
+type create_message = {
+	content : string;
+	?nonce : string option;
+	~tts : bool;
+	?file : string option;
+	?embed : embed option;
+	?payload_json : string option;
+}
+
+type edit_message = {
+	?content : string option;
+	?embed : embed option;
+}
+
+type guild_member = {
+	?user : user option;
+	?nick : string option;
+	~roles : string list;
+	~joined_at : string;
+	~deaf : bool;
+	~mute : bool;
+	~guild_id : string;
+}
+
+type role = {
+	id : string;
+	name : string;
+	color : int;
+	hoist : bool;
+	position : int;
+	permissions : int;
+	managed : bool;
+	mentionable : bool;
+}
+
+type attachment = {
+	id : string;
+	filename : string;
+	size : int;
+	url : string;
+	proxy_url : string;
+	?height : int option;
+	?width : int option;
+}
+
+type embed = {
+	?title : string option;
+	?kind <json name="type"> : string option;
+	?description : string option;
+	?url : string option;
+	?timestamp : string option;
+	?color : int option;
+	(* TODO rest of fields *)
+}
+
+type emoji = {
+	?id : string option;
+	name : string;
+	~roles : string list;
+	?user : user option;
+	?require_colons : bool option;
+	?managed : bool option;
+	?animated : bool option;
+}
+
+type reaction = {
+	count : int;
+	me : bool;
+	emoji : emoji;
+}
+
+type user = {
+	id : string;
+	~username : string;
+	~discriminator : string;
+	?avatar : string option;
+	?bot : bool option;
+	?pfa_enabled : bool option;
+	?locale : string option;
+	?verified : bool option;
+	?email : string option;
+	~flags : int;
+	?premium_type : int option;
+}
