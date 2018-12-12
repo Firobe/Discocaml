@@ -14,6 +14,8 @@ Furthermore, it uses `dune` as a build system.
 
 ## Documentation
 
+The latest version is available [here](https://firobe.fr/discocaml)  
+
 `dune` requires the `odoc` program to generate the documentation
 - Run `opam install odoc`
 - Then `make doc`. The documentation can then be found in
