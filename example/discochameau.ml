@@ -38,7 +38,6 @@ let handler bot = function
           >|= ignore
         | "!cn" :: n :: _ ->
           let%lwt ch = Channel.get bot ~channel_id in
-          Printf.printf "Got\n%!";
           let channel_name = Some n in
           let channel = {ch with channel_name} in
           Channel.modify bot ~channel >|= ignore

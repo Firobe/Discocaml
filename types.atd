@@ -18,7 +18,6 @@ type event = {
 }<json adapter.ocaml="Wrappers.Event_adapter"> 
 
 type event_kind = [
-	| READY of ready
 	| CHANNEL_CREATE of channel
 	| CHANNEL_UPDATE of channel
 	| CHANNEL_DELETE of channel
@@ -49,7 +48,9 @@ type event_kind = [
 	| VOICE_STATE_UPDATE of voice_state
 	| VOICE_SERVER_UPDATE of voice_server_update
 	| WEBHOOKS_UPDATE of webhook_update
-	| PRESENCES_REPLACE of raw_json
+	| PRESENCES_REPLACE of raw_json (* Do not handle *)
+	| READY of ready (* Do not handle *)
+	| RESUMED of garbage (* Do not handle *)
 ]<ocaml repr="classic">
 
 type webhook_update = {
@@ -185,6 +186,21 @@ type channel = {
 	?parent_id : string option;
 	?last_pin_timestamp : string option;
 } <ocaml field_prefix="channel_">
+type channel_array = channel list
+
+(*
+type channel_update = {
+	?position : int option;
+	?permission_overwrites : overwrite list;
+	?name : string option;
+	?topic : string option;
+	?nsfw : bool option;
+	?bitrate : int option;
+	?user_limit : int option;
+	?rate_limit_per_user : int option;
+	?parent_id : string option;
+} <ocaml field_prefix="cu_">
+*)
 
 type message_activity = {
 	kind <json name="type"> : int;
@@ -286,6 +302,7 @@ type guild = {
 	~channels : channel list;
 	~presences : presence_update list;
 }
+type guild_array = guild list
 
 type voice_state = {
 	~guild_id : string;
@@ -416,3 +433,5 @@ type user = {
 	~flags : int;
 	?premium_type : int option;
 }
+
+type user_array = user list

@@ -2,6 +2,20 @@ open Types_t
 
 type t = message
 
+(** Utils *)
+
+(** Creates a {!create_message} object that can then be sent using {!send}. *)
+val create : content:string -> ?nonce:string -> ?tts:bool -> ?file:string ->
+  ?embed:embed -> ?payload_json:string -> unit -> create_message
+
+(** [Message.mentions message user] returns [true] if the [message] mentions
+    [user]
+*)
+val mentions : t -> User.t -> bool
+
+
+(** REST API *)
+
 (** Type of querty to be passed to {!query} *)
 type query_type = Around | Before | After
 
@@ -41,14 +55,17 @@ val delete : Bot.t -> channel_id : string -> message_id : string -> unit Lwt.t
 *)
 val bulk_delete : Bot.t -> channel_id : string -> string list -> unit Lwt.t
 
-(* Util *)
+val create_reaction : Bot.t -> channel_id:string ->
+  message_id:string -> emoji:string -> unit Lwt.t
 
-(** Creates a {!create_message} object that can then be sent using {!send}. *)
-val create : content:string -> ?nonce:string -> ?tts:bool -> ?file:string ->
-  ?embed:embed -> ?payload_json:string -> unit -> create_message
+val delete_user_reaction :Bot.t -> channel_id:string ->
+  message_id:string -> emoji:string -> user_id:string -> unit Lwt.t  
 
-(** [Message.mentions message user] returns [true] if the [message] mentions
-    [user]
-*)
-val mentions : t -> user -> bool
+val delete_own_reaction : Bot.t -> channel_id:string ->
+  message_id:string -> emoji:string -> unit Lwt.t  
 
+val delete_all_reactions  :Bot.t -> channel_id:string ->
+  message_id:string -> unit Lwt.t  
+
+val get_reactions : Bot.t -> channel_id:string ->
+  message_id:string -> emoji:string -> User.t list Lwt.t  

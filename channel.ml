@@ -9,7 +9,8 @@ let get bot ~channel_id =
   >>= Http.check_code 200 >>= Http.to_string >|= Types_j.channel_of_string
 
 let modify bot ~(channel : t) = 
-  Http.call (Bot.token bot) `PATCH
+  let body = Types_j.string_of_channel channel in
+  Http.call (Bot.token bot) ~body `PATCH
     (Http.Endpoints.Channel.channel channel.channel_id)
   >>= Http.check_code 200 >>= Http.to_string >|= Types_j.channel_of_string
 
@@ -26,7 +27,7 @@ let create_invite bot ~channel_id ?max_age ?max_uses ?temporary ?unique () =
 
 let edit_permission bot ~channel_id ~overwrite_id ~allow ~deny ~kind =
   let body = Yojson.Safe.to_string
-      (`Assoc [("allow", `Bool allow); ("deny", `Bool deny);
+      (`Assoc [("allow", `Int allow); ("deny", `Int deny);
                ("type", `String kind)]) in
   Http.call (Bot.token bot) ~body `PUT
     (Http.Endpoints.Channel.permissions channel_id overwrite_id)
@@ -55,4 +56,16 @@ let add_pinned_message bot ~channel_id ~message_id =
 let delete_pinned_message bot ~channel_id ~message_id =
   Http.call (Bot.token bot) `DELETE
     (Http.Endpoints.Channel.pin channel_id message_id)
+  >>= Http.check_code 204 >|= ignore
+
+let add_dm_recipient bot ~channel_id ~user_id ~access_token ~nick =
+  let body = Yojson.Safe.to_string
+      (`Assoc [("access_token", `String access_token);("nick", `String nick)])
+  in Http.call (Bot.token bot) ~body `PUT
+    (Http.Endpoints.Channel.recipients channel_id user_id)
+  >>= Http.check_code 204 >|= ignore
+
+let remove_dm_recipient bot ~channel_id ~user_id =
+  Http.call (Bot.token bot) `DELETE
+    (Http.Endpoints.Channel.recipients channel_id user_id)
   >>= Http.check_code 204 >|= ignore

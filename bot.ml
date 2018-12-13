@@ -127,5 +127,3 @@ let stop bot =
 
 let user b = Opt.get b.user
 let token b = b.token
-
-(* https://discordapp.com/oauth2/authorize?&client_id=520343422591172613&scope=bot&permissions=0 *)
