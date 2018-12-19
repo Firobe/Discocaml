@@ -19,6 +19,10 @@ let handler bot = function
     let words = String.nsplit mess.content " " in
     if mess.author.id <> botu.id then (match words with
         | "!ping" :: _ -> send_simple bot channel_id "pong"
+        | "!spam" :: text :: nb :: _ ->
+          for%lwt n = 1 to (int_of_string nb) do
+            send_simple bot channel_id text
+          done
         | "!exit" :: _ ->
           let%lwt () = send_simple bot channel_id "Bye :(" in
           Bot.stop bot
