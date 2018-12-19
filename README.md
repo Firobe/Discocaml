@@ -24,3 +24,16 @@ The latest version is available [here](https://firobe.fr/discocaml)
 Furthermore, a running example is available in `examples/`. It can be built and
 run using `make && make run` provided that a `token` file containing your bot
 token is present is the directory.
+
+## Current features
+
+- API functions related to messages, users and channels
+- Rate limiting by route
+- OCaml abstractions for most Discord types
+
+### TODO
+
+- Complete API coverage
+- Sharding
+- Voice
+- Resuming
