@@ -3,7 +3,7 @@
 	(public_name discocaml)
 	(libraries atdgen cohttp-lwt-unix websocket-lwt extlib)
 	(preprocess (pps lwt_ppx))
-	(private_modules types_v types_j http wrappers)
+	;;(private_modules types_v types_j http wrappers)
 )
 
 (rule

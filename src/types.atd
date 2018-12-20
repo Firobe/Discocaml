@@ -7,6 +7,7 @@ type payload = [
 	| Invalid_session of inv_session
 	| Heartbeat of int
 	| Heartbeat_ACK of garbage
+	| Resume of gateway_resume
 ]<json adapter.ocaml="Wrappers.Payload_adapter"><ocaml repr="classic">
 
 type garbage = {~d : int; ~t : int}
@@ -145,6 +146,12 @@ type identify = {
 
 type inv_session = {
 	d <ocaml name="resumable"> : bool
+}
+
+type gateway_resume = {
+	token : string;
+	session_id : string;
+	seq : int
 }
 
 type ready = {

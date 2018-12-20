@@ -35,7 +35,8 @@ module Payload_opcode = struct
     type t = string
     let assoc = [(0, "Event"); (10, "Hello");
                  (9, "Invalid_session"); (2, "Identify");
-                 (11, "Heartbeat_ACK"); (1, "Heartbeat")]
+                 (11, "Heartbeat_ACK"); (1, "Heartbeat");
+                 (6, "Resume"); (7, "Reconnect")]
 end
 module Payload_opcode_wrapper = Wrapper (Payload_opcode)
 
@@ -50,7 +51,7 @@ module Payload_adapter = struct
                 n <> "op" && n <> "d") l) in
             let full = begin match data with
                 | `Assoc _ -> combine data without
-                | _ -> without
+                | _ -> combine without (`Assoc ["d", data])
             end in
             `List [`String name; full]
         | _ -> assert false
