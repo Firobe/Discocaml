@@ -90,6 +90,8 @@ module Rate_Limiter = struct
       let%lwt () =
         if rl_reset > itime () then (
           let diff = rl_reset - (itime ()) in
+          let%lwt () = Lwt_log.info 
+              (Printf.sprintf "Preventive RL, sleeping for %ds" diff) in
           Lwt_unix.sleep (float_of_int diff)
         ) else Lwt.return_unit
       in
@@ -104,8 +106,23 @@ module Rate_Limiter = struct
     let rl_reset = get "X-RateLimit-Reset" in
     Hashtbl.replace routes route {rl_limit; rl_remaining; rl_reset};
     let lock = Hashtbl.find locks route in
-    Lwt_mutex.unlock lock; a
+    Lwt_mutex.unlock lock;
+    Lwt.return a
 end
+
+let to_string = Cohttp_lwt.Body.to_string
+let to_json body = to_string body >|= Yojson.Safe.from_string
+
+let rec call_retry body headers meth url =
+  let%lwt resp, rbody = Client.call ~body ~headers meth url in
+  if Code.code_of_status (Response.status resp) = 429 then
+    let open Yojson.Safe.Util in
+    let%lwt delay = to_json rbody >|= member "retry_after" >|= to_int in
+    let%lwt () = Lwt_log.warning
+        (Printf.sprintf "Hard RL, sleeping for %dms" delay) in
+    let%lwt () = Lwt_unix.sleep (float_of_int delay /. 1000.) in
+    call_retry body headers meth url
+  else Lwt.return (resp, rbody)
 
 let call token ?(body="") ?(headers=Header.init ()) meth endpoint =
   let route = endpoint true in
@@ -114,7 +131,7 @@ let call token ?(body="") ?(headers=Header.init ()) meth endpoint =
   let headers = Header.add headers "Authorization" ("Bot " ^ token) in
   let headers = Header.add headers "Content-Type" ("application/json") in
   let body = Cohttp_lwt.Body.of_string body in
-  Client.call ~body ~headers meth url >|=
+  call_retry body headers meth url >>=
   Rate_Limiter.update route
 
 let check_code code (resp, body) =
@@ -123,6 +140,3 @@ let check_code code (resp, body) =
   else 
     let%lwt err = Cohttp_lwt.Body.to_string body in
     Lwt.fail (HTTP_Bad_Return err)
-
-let to_string = Cohttp_lwt.Body.to_string
-let to_json body = to_string body >|= Yojson.Safe.from_string

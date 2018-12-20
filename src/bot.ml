@@ -25,6 +25,12 @@ exception Bad_opcode
 exception Resumable_stop
 exception Fatal_stop
 
+let () =
+  Lwt_log.default :=
+    Lwt_log.channel
+      ~template:"$(date)[$(level)] $message"
+      ~close_mode: `Keep ~channel:Lwt_io.stdout ()
+
 let get_uri token =
   let%lwt answer =
     Http.call token `GET Http.Endpoints.Gateway.gateway_bot
