@@ -8,6 +8,7 @@ type payload = [
 	| Heartbeat of int
 	| Heartbeat_ACK of garbage
 	| Resume of gateway_resume
+	| Reconnect of garbage
 ]<json adapter.ocaml="Wrappers.Payload_adapter"><ocaml repr="classic">
 
 type garbage = {~d : int; ~t : int}

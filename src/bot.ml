@@ -106,6 +106,7 @@ let react_payload bot handler = function
   | Invalid_session {resumable} ->
     Lwt.fail (if resumable then Invalid_session else Fatal_stop "Invalid session")
   | Heartbeat_ACK _ -> bot.heartbeat_ok <- true; Lwt.return bot
+  | Reconnect _ -> Lwt.fail (Fatal_stop "Expecting RECONNECT")
   | Identify _ | Heartbeat _ | Resume _ -> Lwt.fail Bad_opcode
 
 let react bot handler frame =
