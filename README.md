@@ -1,3 +1,5 @@
+**Discocaml is no longer developed. See the great [disml](https://github.com/Mishio595/disml) for a more mature alternative** 
+
 # Discocaml
 
 **Discocaml** is a library providing OCaml bindings to the Discord client API. It is
